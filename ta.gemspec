@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["domas.bitvinskas@me.com"]
   gem.description   = %q{Technical analysis gem.}
   gem.summary       = %q{Technical analysis gem.}
-  gem.homepage      = ""
+  gem.homepage      = "http://github.com/Nedomas/ta"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -14,4 +14,8 @@ Gem::Specification.new do |gem|
   gem.name          = "ta"
   gem.require_paths = ["lib"]
   gem.version       = Ta::VERSION
+
+  gem.add_dependency 'rails'
+  gem.add_dependency 'securities'
+  gem.add_development_dependency 'rspec'
 end
