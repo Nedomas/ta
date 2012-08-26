@@ -1,33 +1,53 @@
 module Ta
   #
   # Moving averages
-  #
+  # Usage: Ta::Moving_average.new(:type => :ema, :periods => 2, :data => [1, 2, 3, 4])
+  # :type is set to default :sma if not specified.
 	class Moving_average
 
 		# Error handling
 		class Moving_averageException < StandardError
 		end
 
-		TYPES_ARRAY = [:sma, :ema]
+		TYPES_ARRAY = [:sma]
 
 		def initialize parameters
-			validate(parameters)
-			# Set default values
-			# if parameters[:type].nil? || parameters[:type].empty?
-			# 	puts 'empty'
-			# end
-			# # parameters[:type] = type
-			# periods = parameters[:periods]
-			# data = parameters[:data]
-   		#    puts "For type  with period #{periods} parameters are #{data}, END"
-   		#    puts parameters
-   		puts parameters
+			validate_input(parameters)
+			@type = parameters[:type]
+			@periods = parameters[:periods]
+			# FIXME: Accept hash from securities as data.
+			@data = parameters[:data]
+			calculate_output(parameters)
     end
 
     private
 
+    def calculate_output parameters
+
+    	#
+    	# Calculating Simple Moving Average.
+    	# Ta::Moving_average.new(:type => :sma, :data => [1, 2, 3, 4, 5], :periods => 2)
+
+    	if @type == :sma
+    		@sma = []
+    		# Should return [nil, (1+2)/2, (2+3)/2, (3+4)/2, (4+5)/2]
+    		@data.each_with_index do |value, index|
+    			from = index+1-@periods
+    			if from >= 0
+    				sum = @data[from..index].inject { |sum, value| sum + value }
+    				@sma[index] = sum/@periods.to_f
+    			else
+    				@sma[index] = nil
+    			end
+    		end
+    		# Return [nil, 1.5, 2.5, 3.5, 4.5]
+    		return @sma
+    	end
+
+    end
+
     # Validate input parameters
-    def validate parameters
+    def validate_input parameters
 
     	unless parameters.is_a?(Hash)
 				raise Moving_averageException, 'Given parameters have to be a hash.'
@@ -60,6 +80,9 @@ module Ta
   		# 	:close=>"413.44", 
   		# 	:volume=>"9286500", 
   		# 	:adj_close=>"411.67"}]}
+
+  		# Currently accepts arrays only.
+  		# FIXME: Should accept securities gem output as input.
 			unless parameters[:data].is_a?(Array)
 				raise Moving_averageException, 'Given data must be an array.'
 			end
