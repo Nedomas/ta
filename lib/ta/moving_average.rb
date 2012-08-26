@@ -5,6 +5,7 @@ module Ta
   # :type is set to default :sma if not specified.
 	class Moving_average
 
+		attr_reader :sma, :data
 		# Error handling
 		class Moving_averageException < StandardError
 		end
@@ -16,7 +17,6 @@ module Ta
 			@type = parameters[:type]
 			@periods = parameters[:periods]
 			# FIXME: Accept hash from securities as data.
-			@data = parameters[:data]
 			calculate_output(parameters)
     end
 
@@ -29,17 +29,46 @@ module Ta
     	# Ta::Moving_average.new(:type => :sma, :data => [1, 2, 3, 4, 5], :periods => 2)
 
     	if @type == :sma
-    		@sma = []
-    		# Should return [nil, (1+2)/2, (2+3)/2, (3+4)/2, (4+5)/2]
-    		@data.each_with_index do |value, index|
-    			from = index+1-@periods
-    			if from >= 0
-    				sum = @data[from..index].inject { |sum, value| sum + value }
-    				@sma[index] = sum/@periods.to_f
-    			else
-    				@sma[index] = nil
-    			end
-    		end
+
+    		#
+    		# FIXME: Not very pretty way to check the input and try to DRY.
+    		#
+
+    		if @input == :array
+	    		@sma = []
+	    		# Should return [nil, (1+2)/2, (2+3)/2, (3+4)/2, (4+5)/2]
+	    		@data.each_with_index do |value, index|
+	    			from = index+1-@periods
+	    			if from >= 0
+	    				sum = @data[from..index].inject { |sum, value| sum + value }
+	    				@sma[index] = sum/@periods.to_f
+	    			else
+	    				@sma[index] = nil
+	    			end
+	    		end
+	    	elsif @input == :hash
+	    		#
+	    		# HASH from securities
+	    		@sma = Hash.new
+
+	    		@data.each do |symbol, stock_data|
+
+	    			very_stupid_array = []
+		    		stock_data.each_with_index do |value, index|
+		    			from = index+1-@periods
+		    			if from >= 0
+		    				sum = stock_data[from..index].inject { |sum, value| sum + value }
+		    				very_stupid_array[index] = sum/@periods.to_f
+		    			else
+		    				very_stupid_array[index] = nil
+		    			end
+		    		end
+		    		@sma[symbol] = very_stupid_array
+
+
+		    	end
+
+	    	end
     		# Return [nil, 1.5, 2.5, 3.5, 4.5]
     		return @sma
     	end
@@ -83,13 +112,46 @@ module Ta
 
   		# Currently accepts arrays only.
   		# FIXME: Should accept securities gem output as input.
-			unless parameters[:data].is_a?(Array)
-				raise Moving_averageException, 'Given data must be an array.'
+  		# For testing
+  		# Ta::Moving_average.new(:type => :sma, :data => Securities::Stock.new(["aapl", "yhoo"]).history(:start_date => '2012-01-01', :end_date => '2012-01-05', :periods => :daily).results, :periods => 5)
+
+  		@data = Hash.new
+			if parameters[:data].is_a?(Array)
+				# Got data not from securities gem
+				@input = :array
+				@data = parameters[:data]
+
+				# Different error methods for different type of given methods
+				data_length = @data.length
+				length_error = true if data_length < parameters[:periods]
+
+			elsif parameters[:data].is_a?(Hash)
+				@input = :hash
+				# Securities gem data
+					parameters[:data].each do |symbol, stock_data|
+						stupid_array = []
+						stock_data.each_with_index do |row, index|
+							stupid_array[index] = row[:adj_close].to_f
+						end
+						@data[symbol] = stupid_array
+
+						# Different error methods for different type of given methods
+						data_length = @data[symbol].length
+						length_error = true if data_length < parameters[:periods]
+					end
+			else
+				raise Moving_averageException, 'Alien data. Given data must be an array or a hash.'
 			end
 
-			unless parameters[:data].length >= parameters[:periods]
-				raise Moving_averageException, "Data point length (#{parameters[:data].length}) must be greater or equal to periods value (#{parameters[:periods]})."
+			if length_error == true
+				raise Moving_averageException, "Data point length (#{data_length}) must be greater or equal to periods value (#{parameters[:periods]})."
 			end
+
+			# unless @data.length >= parameters[:periods]
+			# 	raise Moving_averageException, "Data point length (#{parameters[:data].length}) must be greater or equal to periods value (#{parameters[:periods]})."
+			# end
+
+			return @data
 
     end
 

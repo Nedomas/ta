@@ -16,6 +16,6 @@ Gem::Specification.new do |gem|
   gem.version       = Ta::VERSION
 
   gem.add_dependency 'rails'
-  gem.add_dependency 'securities'
   gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'securities'
 end
