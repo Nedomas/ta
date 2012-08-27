@@ -5,7 +5,7 @@ module Ta
   # :type is set to default :sma if not specified.
 	class Moving_average
 
-		attr_reader :sma, :data
+		attr_reader :data, :results
 		# Error handling
 		class Moving_averageException < StandardError
 		end
@@ -31,48 +31,43 @@ module Ta
     	if @type == :sma
 
     		#
-    		# FIXME: Not very pretty way to check the input and try to DRY.
+    		# FIXME: Not a very pretty way to check the input and try to DRY.
     		#
 
     		if @input == :array
-	    		@sma = []
-	    		# Should return [nil, (1+2)/2, (2+3)/2, (3+4)/2, (4+5)/2]
-	    		@data.each_with_index do |value, index|
-	    			from = index+1-@periods
-	    			if from >= 0
-	    				sum = @data[from..index].inject { |sum, value| sum + value }
-	    				@sma[index] = sum/@periods.to_f
-	    			else
-	    				@sma[index] = nil
-	    			end
-	    		end
+	    		calculate_sma(@data, @periods)
 	    	elsif @input == :hash
 	    		#
-	    		# HASH from securities
-	    		@sma = Hash.new
+	    		# Hash from securities gem.
+	    		@other = Hash.new
 
 	    		@data.each do |symbol, stock_data|
 
-	    			very_stupid_array = []
-		    		stock_data.each_with_index do |value, index|
-		    			from = index+1-@periods
-		    			if from >= 0
-		    				sum = stock_data[from..index].inject { |sum, value| sum + value }
-		    				very_stupid_array[index] = sum/@periods.to_f
-		    			else
-		    				very_stupid_array[index] = nil
-		    			end
-		    		end
-		    		@sma[symbol] = very_stupid_array
-
+	    			something = calculate_sma(stock_data, @periods)
+		    		@other[symbol] = something
 
 		    	end
 
 	    	end
     		# Return [nil, 1.5, 2.5, 3.5, 4.5]
-    		return @sma
+    		return @other
     	end
 
+    end
+
+    def calculate_sma dat, period
+    	@results = []
+  		# Should return [nil, (1+2)/2, (2+3)/2, (3+4)/2, (4+5)/2]
+  		dat.each_with_index do |value, index|
+  			from = index+1-period
+  			if from >= 0
+  				sum = dat[from..index].inject { |sum, value| sum + value }
+  				@results[index] = (sum/period.to_f).round(3)
+  			else
+  				@results[index] = nil
+  			end
+  		end
+  		return @results
     end
 
     # Validate input parameters
@@ -117,7 +112,7 @@ module Ta
 
   		@data = Hash.new
 			if parameters[:data].is_a?(Array)
-				# Got data not from securities gem
+				# Got data as [1, 2, 3, 4, 5]
 				@input = :array
 				@data = parameters[:data]
 
@@ -126,14 +121,14 @@ module Ta
 				length_error = true if data_length < parameters[:periods]
 
 			elsif parameters[:data].is_a?(Hash)
+				# Probably got data from securities gem.
 				@input = :hash
-				# Securities gem data
 					parameters[:data].each do |symbol, stock_data|
-						stupid_array = []
+						prices_array = []
 						stock_data.each_with_index do |row, index|
-							stupid_array[index] = row[:adj_close].to_f
+							prices_array[index] = row[:adj_close].to_f
 						end
-						@data[symbol] = stupid_array
+						@data[symbol] = prices_array
 
 						# Different error methods for different type of given methods
 						data_length = @data[symbol].length
@@ -146,10 +141,6 @@ module Ta
 			if length_error == true
 				raise Moving_averageException, "Data point length (#{data_length}) must be greater or equal to periods value (#{parameters[:periods]})."
 			end
-
-			# unless @data.length >= parameters[:periods]
-			# 	raise Moving_averageException, "Data point length (#{parameters[:data].length}) must be greater or equal to periods value (#{parameters[:periods]})."
-			# end
 
 			return @data
 

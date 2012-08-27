@@ -24,16 +24,16 @@ Or install it yourself as:
 Usage:
 
 	Ta::Moving_average.new(:type => :sma, :data => [1, 2, 3, 4, 5], :periods => 2)
+	:type is set to default :sma if not specified.
 
-:type is set to default :sma if not specified.
-It returns SMA's in data point index places. Like:
-
+	It returns SMA's in data point index places. Like:
 	[nil, 1.5, 2.5, 3.5, 4.5]
 
 ## To do
 
 * Moving averages (SMA+, CMA, WMA, EMA, MMA).
-* Make it accept securities gem output as input without the extra hassle.
+* Make it accept securities gem output as input without the extra hassle.+
+* Refactor for a better gem skeleton.
 
 ## Contributing
 
