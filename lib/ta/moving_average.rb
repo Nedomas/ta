@@ -14,60 +14,46 @@ module Ta
 
 		def initialize parameters
 			validate_input(parameters)
-			@type = parameters[:type]
-			@periods = parameters[:periods]
-			# FIXME: Accept hash from securities as data.
+			# @type = parameters[:type]
+			# @periods = parameters[:periods]
 			calculate_output(parameters)
     end
 
     private
 
     def calculate_output parameters
-
     	#
-    	# Calculating Simple Moving Average.
     	# Ta::Moving_average.new(:type => :sma, :data => [1, 2, 3, 4, 5], :periods => 2)
+    	if parameters[:type] == :sma
 
-    	if @type == :sma
-
-    		#
-    		# FIXME: Not a very pretty way to check the input and try to DRY.
-    		#
-
-    		if @input == :array
-	    		calculate_sma(@data, @periods)
-	    	elsif @input == :hash
-	    		#
+    		if @input_type == :array
+	    		@results = calculate_sma(@data, parameters[:periods])
+	    	elsif @input_type == :hash
 	    		# Hash from securities gem.
-	    		@other = Hash.new
-
+	    		@results = Hash.new
 	    		@data.each do |symbol, stock_data|
-
-	    			something = calculate_sma(stock_data, @periods)
-		    		@other[symbol] = something
-
+		    		@results[symbol] = calculate_sma(stock_data, parameters[:periods])
 		    	end
-
 	    	end
-    		# Return [nil, 1.5, 2.5, 3.5, 4.5]
-    		return @other
+	    	return @results
     	end
-
+    	# TODO: Add EMA, etc.
     end
 
-    def calculate_sma dat, period
-    	@results = []
-  		# Should return [nil, (1+2)/2, (2+3)/2, (3+4)/2, (4+5)/2]
-  		dat.each_with_index do |value, index|
-  			from = index+1-period
+    #
+    # Calculating Simple Moving Average.
+    def calculate_sma data, periods
+    	sma = []
+  		data.each_with_index do |value, index|
+  			from = index+1-periods
   			if from >= 0
-  				sum = dat[from..index].inject { |sum, value| sum + value }
-  				@results[index] = (sum/period.to_f).round(3)
+  				sum = data[from..index].inject { |sum, value| sum + value }
+  				sma[index] = (sum/periods.to_f).round(3)
   			else
-  				@results[index] = nil
+  				sma[index] = nil
   			end
   		end
-  		return @results
+  		return sma
     end
 
     # Validate input parameters
@@ -105,35 +91,29 @@ module Ta
   		# 	:volume=>"9286500", 
   		# 	:adj_close=>"411.67"}]}
 
-  		# Currently accepts arrays only.
-  		# FIXME: Should accept securities gem output as input.
   		# For testing
   		# Ta::Moving_average.new(:type => :sma, :data => Securities::Stock.new(["aapl", "yhoo"]).history(:start_date => '2012-01-01', :end_date => '2012-01-05', :periods => :daily).results, :periods => 5)
 
-  		@data = Hash.new
-			if parameters[:data].is_a?(Array)
+  		@data = parameters[:data]
+			if @data.is_a?(Array)
 				# Got data as [1, 2, 3, 4, 5]
-				@input = :array
-				@data = parameters[:data]
+				@input_type = :array
 
-				# Different error methods for different type of given methods
-				data_length = @data.length
-				length_error = true if data_length < parameters[:periods]
+				# Raise this exception after alien data exception.
+				length_error = true if @data.length < parameters[:periods]
+			elsif @data.is_a?(Hash)
+				# Probably got the data from securities gem.
+				@input_type = :hash
 
-			elsif parameters[:data].is_a?(Hash)
-				# Probably got data from securities gem.
-				@input = :hash
-					parameters[:data].each do |symbol, stock_data|
-						prices_array = []
-						stock_data.each_with_index do |row, index|
-							prices_array[index] = row[:adj_close].to_f
-						end
-						@data[symbol] = prices_array
+				# Traverse this hash to {symbol => adj_close prices array}
+				@data.each do |symbol, stock_data|
+					prices_array = []
+					stock_data.each_with_index { |row, index| prices_array[index] = row[:adj_close].to_f }
+					@data[symbol] = prices_array.reverse
 
-						# Different error methods for different type of given methods
-						data_length = @data[symbol].length
-						length_error = true if data_length < parameters[:periods]
-					end
+					# Raise this exception after alien data exception.
+					length_error = true if @data[symbol].length < parameters[:periods]
+				end
 			else
 				raise Moving_averageException, 'Alien data. Given data must be an array or a hash.'
 			end
@@ -143,9 +123,6 @@ module Ta
 			end
 
 			return @data
-
     end
-
 	end
-
 end

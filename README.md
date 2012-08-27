@@ -22,12 +22,16 @@ Or install it yourself as:
 
 # Moving averages
 Usage:
-
+	
+	Accepts an array as data.
 	Ta::Moving_average.new(:type => :sma, :data => [1, 2, 3, 4, 5], :periods => 2)
 	:type is set to default :sma if not specified.
 
 	It returns SMA's in data point index places. Like:
 	[nil, 1.5, 2.5, 3.5, 4.5]
+
+	Accepts a hash from securities gem as data.
+	Ta::Moving_average.new(:type => :sma, :data => Securities::Stock.new(["aapl", "yhoo"]).history(:start_date => '2012-01-01', :end_date => '2012-01-30', :periods => :daily).results, :periods => 5)
 
 ## To do
 
