@@ -20,7 +20,7 @@ module Ta
 			end
 		end
 
-		def add parameters
+		def calc parameters
 			# Check is parameters are usable.
 			unless parameters.is_a?(Hash)
 				raise DataException, 'Given parameters have to be a hash. FORMAT: .add(:type => :sma, :variables => 12)'
