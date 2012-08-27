@@ -37,7 +37,7 @@ Usage:
 
 * Moving averages (SMA+, CMA, WMA, EMA, MMA).
 * Make it accept securities gem output as input without the extra hassle.+
-* Refactor for a better gem skeleton.
+* Refactor for a better gem skeleton.+
 
 ## Contributing
 
