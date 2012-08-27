@@ -1,7 +1,7 @@
 module Ta
 	class Data
 
-		attr_reader :data
+		attr_reader :data, :results
 		MOVING_AVERAGES_ARRAY = [:sma, :ema, :wma]
 		STOCHASTICS_ARRAY = [:macd, :rsi]
 		# Error handling
@@ -31,17 +31,11 @@ module Ta
 
 			# Check which type is it and forward it to the right class.
 			case
-				when MOVING_AVERAGES_ARRAY.include?(parameters[:type]) then results = Ta::Moving_average.calculate(@data, parameters)
-				when STOCHASTICS_ARRAY.include?(parameters[:type]) then puts "THIS IS A STOCH"
+				when MOVING_AVERAGES_ARRAY.include?(parameters[:type]) then @results = Ta::Moving_average.calculate(@data, parameters)
+				when STOCHASTICS_ARRAY.include?(parameters[:type]) then puts "Do something for stochastics."
 			else 
 				raise DataException, 'Invalid type value specified.'
 			end
-			return results
-		end
-
-		# TODO: make results accessible with add().
-		def data
-			return @data
 		end
 
 	end

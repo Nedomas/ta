@@ -1,32 +1,18 @@
 module Ta
   #
   # Moving averages
-  # Usage: Ta::Moving_average.new(:type => :ema, :periods => 2, :data => [1, 2, 3, 4])
-  # :type is set to default :sma if not specified.
 	class Moving_average
 
 		def self.calculate data, parameters
 
-      # puts "DATA IS A #{data.class}"
-
 			if data.is_a?(Hash)
         @results = Hash.new
+        # stock_data is {"aapl" => {:close => [1, 2, 3], :open => []}}
         data.each do |symbol, stock_data|
-          # {"aapl" => {:close => [1, 2, 3], :open => []}}
-          usable_data = Ta::Parser.parse_data(stock_data)
-          @results[symbol] = sma(usable_data, parameters[:variables])
+          # Parser returns in {:date=>[2012.0, 2012.0, 2012.0], :open=>[409.4, 410.0, 414.95],} format
+          @results[symbol] = sma(Ta::Parser.parse_data(stock_data), parameters[:variables])
         end
-        puts @results
-				# @results = Hash.new
-				# data.each do |symbol, stock_data|
-				# 	case parameters[:type]
-				# 		when :sma 
-				# 			puts stock_data.class
-				# 			@results[symbol] = sma(stock_data, parameters[:variables])
-				# 	end
-				# end
 			else
-
 				case parameters[:type]
 					when :sma then @results = sma(data, parameters[:variables])
 				end
