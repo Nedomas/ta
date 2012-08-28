@@ -19,22 +19,34 @@ Or install it yourself as:
     $ gem install ta
 
 ## Usage
-
-# Moving averages
-Usage:
 	
-	Accepts an array as data.
-	Ta::Moving_average.new(:type => :sma, :data => [1, 2, 3, 4, 5], :periods => 2)
-	:type is set to default :sma if not specified.
+Accepts an array as data
 
-	It returns SMA's in data point index places. Like:
+	my_data = Ta::Data.new([1, 2, 3, 4, 5])
+	my_data.calc(:type => :sma, :variables => 2) 
+
+It returns SMA's in data point index places. Like:
+
 	[nil, 1.5, 2.5, 3.5, 4.5]
+	:type is set to default :sma (Simple Moving Average) if not specified.
 
-	Accepts a hash from securities gem as data.
-	Ta::Moving_average.new(:type => :sma, :data => Securities::Stock.new(["aapl", "yhoo"]).history(:start_date => '2012-01-01', :end_date => '2012-01-30', :periods => :daily).results, :periods => 5)
+Accepts a hash from securities gem as data.
+
+	my_data = Ta::Data.new(Securities::Stock.new(["aapl", "yhoo"]).history(:start_date => '2012-01-01', :end_date => '2012-01-30', :periods => :daily).results)
+	my_data.calc(:type => :sma, :variables => 5)
+
+## Indicators supported
+
+Moving averages
+* SMA+
+* CMA
+* WMA
+* EMA
+* MMA
 
 ## To do
 
+* More validations
 * Moving averages (SMA+, CMA, WMA, EMA, MMA).
 * Make it accept securities gem output as input without the extra hassle.+
 * Refactor for a better gem skeleton.+

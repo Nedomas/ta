@@ -1,5 +1,6 @@
 module Ta
 
+	# Class to parse a securities gem return hash.
 	class Parser
 
 		# Error handling.

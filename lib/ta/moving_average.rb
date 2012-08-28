@@ -8,14 +8,19 @@ module Ta
     end
 
 		def self.calculate data, parameters
-
+      puts data
 			if data.is_a?(Hash)
         results = Hash.new
         data.each do |symbol, stock_data|
-          results[symbol] = case parameters[:type]
-                              when :sma then sma(Ta::Parser.parse_data(stock_data), parameters[:variables])
-                            end
-          # Parser returns in {:date=>[2012.0, 2012.0, 2012.0], :open=>[409.4, 410.0, 414.95],} format
+          # Check if this symbol was empty and don't go further with this.
+          if stock_data.length == 0
+            results[symbol] = []
+          else
+            results[symbol] = case parameters[:type]
+                                when :sma then sma(Ta::Parser.parse_data(stock_data), parameters[:variables])
+                              end
+            # Parser returns in {:date=>[2012.0, 2012.0, 2012.0], :open=>[409.4, 410.0, 414.95],} format
+          end
         end
 			else
 				results = case parameters[:type]
@@ -27,7 +32,7 @@ module Ta
     end
 
     def self.sma data, variables
-      usable_data = []
+      usable_data = Array.new
       # If this is a hash, choose which column of values to use for calculations.
       if data.is_a?(Hash)
         usable_data = data[:adj_close]

@@ -12,11 +12,11 @@ module Ta
 			@data = parameters
 
 			# Check if data usable.
+			if @data.nil? || @data.empty?
+        raise DataException, "There is no data to work on."
+      end
 			unless @data.is_a?(Array) or @data.is_a?(Hash)
 				raise DataException, "Alien data. Given data must be an array or a hash (got #{@data.class})."
-			end
-			if @data.empty?
-				raise DataException, "There is no data to work on."
 			end
 		end
 
@@ -34,7 +34,8 @@ module Ta
 				when MOVING_AVERAGES_ARRAY.include?(parameters[:type]) then @results = Ta::Moving_average.calculate(@data, parameters)
 				when STOCHASTICS_ARRAY.include?(parameters[:type]) then puts "Do something for stochastics."
 			else 
-				raise DataException, 'Invalid type value specified.'
+				# For some reason it doesn't change in GUI.
+				raise DataException, "Invalid indicator type specified (#{parameters[:type]})."
 			end
 		end
 
