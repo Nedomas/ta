@@ -4,6 +4,9 @@ Technical analysis gem.
 
 [![Build Status](https://secure.travis-ci.org/Nedomas/ta.png)](http://travis-ci.org/Nedomas/ta)[![Build Status](https://gemnasium.com/Nedomas/ta.png)](https://gemnasium.com/Nedomas/ta)
 
+Current functionality demo of Ta and Securities gems: http://strangemuseum.heroku.com
+To use this gem with Yahoo Finance information more efficiently, download securities gem: https://rubygems.org/gems/securities
+
 ## Installation
 
 Add this line to your application's Gemfile:
