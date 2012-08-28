@@ -51,6 +51,7 @@ Moving averages
 * Make it accept securities gem output as input without the extra hassle.+
 * Refactor for a better gem skeleton.+
 
+* Write specs.
 * More validations
 * Moving averages (SMA+, CMA, WMA, EMA, MMA).
 * Stochastics.
