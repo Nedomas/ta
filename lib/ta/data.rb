@@ -23,7 +23,7 @@ module Ta
 		def calc parameters
 			# Check is parameters are usable.
 			unless parameters.is_a?(Hash)
-				raise DataException, 'Given parameters have to be a hash. FORMAT: .add(:type => :sma, :variables => 12)'
+				raise DataException, 'Given parameters have to be a hash. FORMAT: .calc(:type => :sma, :variables => 12)'
 			end
 
 			# If not specified, set default :type to :sma.
@@ -32,9 +32,8 @@ module Ta
 			# Check which type is it and forward it to the right class.
 			case
 				when MOVING_AVERAGES_ARRAY.include?(parameters[:type]) then @results = Ta::Moving_average.calculate(@data, parameters)
-				when STOCHASTICS_ARRAY.include?(parameters[:type]) then puts "Do something for stochastics."
+				# when STOCHASTICS_ARRAY.include?(parameters[:type]) then puts "Do something for stochastics."
 			else 
-				# For some reason it doesn't change in GUI.
 				raise DataException, "Invalid indicator type specified (#{parameters[:type]})."
 			end
 		end

@@ -8,11 +8,10 @@ module Ta
     end
 
 		def self.calculate data, parameters
-      puts data
 			if data.is_a?(Hash)
         results = Hash.new
         data.each do |symbol, stock_data|
-          # Check if this symbol was empty and don't go further with this.
+          # Check if this symbol was empty and don't go further with it.
           if stock_data.length == 0
             results[symbol] = []
           else

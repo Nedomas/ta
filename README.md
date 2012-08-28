@@ -37,6 +37,8 @@ Accepts a hash from securities gem as data.
 
 ## Indicators supported
 
+Will add more very soon.
+
 Moving averages
 * SMA+
 * CMA
@@ -46,10 +48,12 @@ Moving averages
 
 ## To do
 
-* More validations
-* Moving averages (SMA+, CMA, WMA, EMA, MMA).
 * Make it accept securities gem output as input without the extra hassle.+
 * Refactor for a better gem skeleton.+
+
+* More validations
+* Moving averages (SMA+, CMA, WMA, EMA, MMA).
+* Stochastics.
 
 ## Contributing
 
