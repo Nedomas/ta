@@ -51,7 +51,10 @@ module Ta
 
     def self.get_variables variables, i=0, default=0
       if variables.is_a?(Array)
+        # In case array is given not like [1, 2] but like this ["1", "2"]. This usually happens when getting data from input forms.
+        variables = variables.map(&:to_i)
         if variables.length < 2
+          return default if i != 0
           return variables[0]
         else
           if variables[i].nil? then return default else return variables[i] end

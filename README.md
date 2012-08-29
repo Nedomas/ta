@@ -42,7 +42,9 @@ Bollinger Bands
 
 	BB output is [middle band, upper band, lower band]
 	my_data.calc(:type => :bb, :variables => [20, 2])
-	Variables has to be a array [periods, multiplier].
+	
+	Variables has to be a array [periods, multiplier]. If not specified, multiplier defaults to 2.
+	my_data.calc(:type => :bb, :variables => 20)
 
 ## Indicators supported
 

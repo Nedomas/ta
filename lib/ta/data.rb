@@ -33,7 +33,7 @@ module Ta
 			# If not specified, set default :type to :sma.
 			parameters[:type] = :sma if parameters[:type].nil? or parameters[:type].empty?
 
-			# Check which type is it and forward it to the right class.
+			# Check if there is such indicator type supported.
 			case
 				when INDICATORS.include?(parameters[:type]) then @results = Ta::Indicator.calculate(@data, parameters)
 			else 
