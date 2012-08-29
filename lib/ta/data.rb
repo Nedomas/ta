@@ -18,6 +18,11 @@ module Ta
 			unless @data.is_a?(Array) or @data.is_a?(Hash)
 				raise DataException, "Alien data. Given data must be an array or a hash (got #{@data.class})."
 			end
+
+			if @data.is_a?(Hash)
+				# Hacky, but a fast way to check if this is a dividends hash without the extra hassle.
+				raise DataException, "Cannot use dividends values for technical analysis." if @data.to_s.include?(':dividends')
+			end
 		end
 
 		def calc parameters

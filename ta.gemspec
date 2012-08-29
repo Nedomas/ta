@@ -4,8 +4,8 @@ require File.expand_path('../lib/ta/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Nedomas"]
   gem.email         = ["domas.bitvinskas@me.com"]
-  gem.description   = %q{Technical analysis gem.}
-  gem.summary       = %q{Technical analysis gem.}
+  gem.description   = %q{Technical analysis gem. Supports Simple and Exponental Moving Averages. Input as array or as securities gem hash.}
+  gem.summary       = %q{Technical analysis gem. Supports Simple and Exponental Moving Averages. Input as array or as securities gem hash.}
   gem.homepage      = "http://github.com/Nedomas/ta"
 
   gem.files         = `git ls-files`.split($\)

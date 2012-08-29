@@ -53,6 +53,7 @@ Moving averages
 
 * Make it accept securities gem output as input without the extra hassle.+
 * Refactor for a better gem skeleton.+
+* Fix dividends error message from securities gem (undefined method `length' for nil:NilClass).+
 
 * Write specs.
 * More validations
