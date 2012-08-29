@@ -40,14 +40,10 @@ Accepts a hash from securities gem as data.
 
 ## Indicators supported
 
-NOW SUPPORTS: SMA (Simpe Moving Averages), EMA (Exponental Moving Averages).
-
-Moving averages
-* SMA+
-* CMA
-* WMA
-* EMA+
-* MMA
+NOW SUPPORTS: 
+* SMA (Simpe Moving Averages)
+* EMA (Exponental Moving Averages)
+* BB (Bollinger Bands)
 
 ## To do
 
@@ -58,6 +54,9 @@ Moving averages
 * Write specs.
 * More validations
 * Moving averages (SMA+, CMA, WMA, EMA+, MMA).
+* Bollinger Bands+.
+* MACD.
+* RSI.
 * Stochastics.
 
 ## Contributing

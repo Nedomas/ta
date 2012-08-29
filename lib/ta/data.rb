@@ -2,8 +2,7 @@ module Ta
 	class Data
 
 		attr_reader :data, :results
-		MOVING_AVERAGES_ARRAY = [:sma, :ema, :wma]
-		STOCHASTICS_ARRAY = [:macd, :rsi]
+		INDICATORS = [:sma, :ema, :bb, :wma, :macd, :rsi]
 		# Error handling
 		class DataException < StandardError
 		end
@@ -36,8 +35,7 @@ module Ta
 
 			# Check which type is it and forward it to the right class.
 			case
-				when MOVING_AVERAGES_ARRAY.include?(parameters[:type]) then @results = Ta::Moving_average.calculate(@data, parameters)
-				# when STOCHASTICS_ARRAY.include?(parameters[:type]) then puts "Do something for stochastics."
+				when INDICATORS.include?(parameters[:type]) then @results = Ta::Indicator.calculate(@data, parameters)
 			else 
 				raise DataException, "Invalid indicator type specified (#{parameters[:type]})."
 			end
