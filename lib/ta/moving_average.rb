@@ -83,7 +83,6 @@ module Ta
           # puts ma
         elsif from > 0
           ema[index] = ((usable_data[index] - ema[index-1]) * k + ema[index-1]).round(3)
-          @ma = ema[index]
         else
           ema[index] = nil
         end
