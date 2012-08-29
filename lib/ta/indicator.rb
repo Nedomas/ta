@@ -49,13 +49,57 @@ module Ta
       return usable_data
     end
 
-    def self.get_variables variables, i=0
+    # periods = get_variables([5, 2], 1, 3)
+    # default_multiplier = 2
+    # multiplier = get_variables(variables, 1, default_multiplier)
+    def self.get_variables variables, i=0, default=0
+      puts "variables=#{variables}, i=#{i}, default=#{default}"
       if variables.is_a?(Array)
-        usable_variable = variables[i]
+        if variables.length < 2
+          puts "Its a fixnum in array #{variables}, returning #{variables[0]}"
+          return variables[0]
+        else
+          puts "Its an array #{variables}, variables[0]=#{variables[0]}, variables[1]=#{variables[1]}"
+          if variables[i].nil?
+            puts "variables[i] #{variables[i]} is nil. returning default #{default}"
+            return default
+          else
+            puts "variables[i] #{variables[i]} is not nil. returning it"
+            return variables[i]
+          end
+        end
       else
-        usable_variable = variables
+        if i != 0
+          puts "Returning default #{default}"
+          return default
+        end
+        puts "its a fixnum #{variables}, returning it, and i is = #{i}"
+        return variables
       end
-      return usable_variable
+      # if i != 0
+      #   if variables.is_a?(Array)
+      #     if variables[i].nil?
+      #       puts "returning default #{default}"
+      #       return default
+      #     else
+      #       puts "returning variables[i] #{variables[i]}"
+      #       return variables[i]
+      #     end
+      #   else
+      #     raise IndicatorException, "You gave an array as variables where you shouldn't."
+      #   end
+      # else
+      #   puts "returning #{variables}"
+      #   return variables
+      # end
+
+      # if variables.is_a?(Array)
+      #   usable_variable = variables[i]
+      #   puts "usab #{usable_variable} and class #{usable_variable.class}"
+      # else
+      #   usable_variable = variables
+      # end
+      # return usable_variable
     end
 
     #
@@ -109,24 +153,27 @@ module Ta
     # Bollinger Bands bb(:variables => 20, 2)
     def self.bb data, variables
       periods = get_variables(variables)
-      multiplier = get_variables(variables, 1)
+      default_multiplier = 2
+      multiplier = get_variables(variables, 1, default_multiplier)
+      # FIXME: Set default multiplier.
       usable_data = Array.new
       usable_data = get_data(data, periods, :adj_close)
       # Middle Band = 20-day simple moving average (SMA)
       # Upper Band = 20-day SMA + (20-day standard deviation of price x 2) 
       # Lower Band = 20-day SMA - (20-day standard deviation of price x 2)
       bb = []
-      usable_data.each_with_index do |value, index|
-        from = index+1-periods
-        if from >= 0
-          middle_band = sma(usable_data[from..index], periods).last
-          upper_band = middle_band + (usable_data.standard_deviation * multiplier)
-          lower_band = middle_band - (usable_data.standard_deviation * multiplier)
-          bb[index] = [middle_band, upper_band.round(3), lower_band.round(3)]
-        else
-          bb[index] = nil
-        end
-      end
+      # usable_data.each_with_index do |value, index|
+      #   from = index+1-periods
+      #   if from >= 0
+      #     middle_band = sma(usable_data[from..index], periods).last
+      #     upper_band = middle_band + (usable_data.standard_deviation * multiplier)
+      #     lower_band = middle_band - (usable_data.standard_deviation * multiplier)
+      #     # output is [middle, upper, lower]
+      #     bb[index] = [middle_band, upper_band.round(3), lower_band.round(3)]
+      #   else
+      #     bb[index] = nil
+      #   end
+      # end
       return bb
     end
 

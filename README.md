@@ -35,8 +35,14 @@ It returns SMA's in data point index places. Like:
 
 Accepts a hash from securities gem as data.
 
-	my_data = Ta::Data.new(Securities::Stock.new(["aapl", "yhoo"]).history(:start_date => '2012-01-01', :end_date => '2012-01-30', :periods => :daily).results)
+	my_data = Ta::Data.new(Securities::Stock.new(["aapl", "yhoo"]).history(:start_date => '2012-01-01', :end_date => '2012-02-30', :periods => :daily).results)
 	my_data.calc(:type => :sma, :variables => 5)
+
+Bollinger Bands
+
+	BB output is [middle band, upper band, lower band]
+	my_data.calc(:type => :bb, :variables => [20, 2])
+	Variables has to be a array [periods, multiplier].
 
 ## Indicators supported
 
