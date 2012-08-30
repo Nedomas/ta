@@ -69,8 +69,9 @@ NOW SUPPORTS:
 * Fix dividends error message from securities gem (undefined method `length' for nil:NilClass).+
 * Recheck formulas.+
 
+* Fix MACD period validation.
 * Write specs.
-* More validations
+* More validations.
 * Moving averages (SMA+, CMA, WMA, EMA+, MMA).
 * Bollinger Bands+.
 * MACD.+

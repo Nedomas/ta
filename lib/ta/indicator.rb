@@ -146,8 +146,8 @@ module Ta
       return bb
     end
 
-    # FIX ME!@!@! PROBABLY WRONG RESULTS.
-    # MACD
+    #
+    # Moving Average Convergence Divergence
 
     # MACD Line: (12-day EMA - 26-day EMA) 
     # Signal Line: 9-day EMA of MACD Line
@@ -171,7 +171,7 @@ module Ta
           slower_ema = ema(usable_data[0..index], slower_periods).last
           macd_line[index] = faster_ema - slower_ema
           if index+1 >= slower_periods + signal_periods
-            # I'm pretty sure this is right
+            # I'm pretty sure this is right.
             signal_line = ema(macd_line[(-signal_periods)..index], signal_periods).last 
             # output is [MACD, Signal, MACD Hist]
             macd_histogram = macd_line[index] - signal_line
