@@ -46,24 +46,34 @@ Bollinger Bands
 	Variables has to be a array [periods, multiplier]. If not specified, multiplier defaults to 2.
 	my_data.calc(:type => :bb, :variables => 20)
 
+Moving Average Convergence Divergence
+
+	MACD output is [MACD line, signal line, MACD histogram]
+	my_data.calc(:type => :macd, :variables => [12, 26, 9])
+	
+	Variables has to be a array [faster_periods, slower_periods, signal_line]. If slower periods and signal line are not specified, they default to 26, 9.
+	my_data.calc(:type => :macd, :variables => 12)
+
 ## Indicators supported
 
 NOW SUPPORTS: 
 * SMA (Simpe Moving Averages)
 * EMA (Exponental Moving Averages)
 * BB (Bollinger Bands)
+* MACD (Moving Average Convergence Divergence)
 
 ## To do
 
 * Make it accept securities gem output as input without the extra hassle.+
 * Refactor for a better gem skeleton.+
 * Fix dividends error message from securities gem (undefined method `length' for nil:NilClass).+
+* Recheck formulas.+
 
 * Write specs.
 * More validations
 * Moving averages (SMA+, CMA, WMA, EMA+, MMA).
 * Bollinger Bands+.
-* MACD.
+* MACD.+
 * RSI.
 * Stochastics.
 

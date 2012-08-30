@@ -19,6 +19,7 @@ module Ta
                                 when :sma then sma(Ta::Parser.parse_data(stock_data), parameters[:variables])
                                 when :ema then ema(Ta::Parser.parse_data(stock_data), parameters[:variables])
                                 when :bb then bb(Ta::Parser.parse_data(stock_data), parameters[:variables])
+                                when :macd then macd(Ta::Parser.parse_data(stock_data), parameters[:variables])
                               end
             # Parser returns in {:date=>[2012.0, 2012.0, 2012.0], :open=>[409.4, 410.0, 414.95],} format
           end
@@ -28,6 +29,7 @@ module Ta
 				            when :sma then sma(data, parameters[:variables])
                     when :ema then ema(data, parameters[:variables])
                     when :bb then bb(data, parameters[:variables])
+                    when :macd then macd(data, parameters[:variables])
 				          end
 			end
 
@@ -66,7 +68,7 @@ module Ta
     end
 
     #
-    # Moving Averages
+    # Lagging indicators
     #
 
     # Simple Moving Average
@@ -78,10 +80,10 @@ module Ta
       # Just the calculation of SMA by the formula.
     	sma = []
   		usable_data.each_with_index do |value, index|
-  			from = index+1-periods
+  			from = index-periods+1
   			if from >= 0
   				sum = usable_data[from..index].sum
-  				sma[index] = (sum/periods.to_f).round(3)
+  				sma[index] = (sum/periods.to_f)
   			else
   				sma[index] = nil
   			end
@@ -89,14 +91,16 @@ module Ta
   		return sma
     end
 
+    #
     # Exponential Moving Average
+
+    # Multiplier: (2 / (Time periods + 1) ) = (2 / (10 + 1) ) = 0.1818 (18.18%)
+    # EMA: {Close - EMA(previous day)} x multiplier + EMA(previous day). 
     def self.ema data, variables
       periods = get_variables(variables)
       usable_data = Array.new
       usable_data = get_data(data, periods, :adj_close)
 
-      # Multiplier: (2 / (Time periods + 1) ) = (2 / (10 + 1) ) = 0.1818 (18.18%)
-      # EMA: {Close - EMA(previous day)} x multiplier + EMA(previous day). 
       ema = []
       k = 2/(periods+1).to_f
       usable_data.each_with_index do |value, index|
@@ -105,7 +109,7 @@ module Ta
           ema[index] = sma(usable_data[from..index], periods).last
           # puts ma
         elsif from > 0
-          ema[index] = ((usable_data[index] - ema[index-1]) * k + ema[index-1]).round(3)
+          ema[index] = ((usable_data[index] - ema[index-1]) * k + ema[index-1])
         else
           ema[index] = nil
         end
@@ -113,7 +117,12 @@ module Ta
       return ema
     end
 
-    # Bollinger Bands bb(:variables => 20, 2)
+    #
+    # Bollinger Bands :type => :bb, :variables => 20, 2)
+
+    # Middle Band = 20-day simple moving average (SMA)
+    # Upper Band = 20-day SMA + (20-day standard deviation of price x 2) 
+    # Lower Band = 20-day SMA - (20-day standard deviation of price x 2)
     def self.bb data, variables
       periods = get_variables(variables)
       default_multiplier = 2
@@ -121,23 +130,60 @@ module Ta
 
       usable_data = Array.new
       usable_data = get_data(data, periods, :adj_close)
-      # Middle Band = 20-day simple moving average (SMA)
-      # Upper Band = 20-day SMA + (20-day standard deviation of price x 2) 
-      # Lower Band = 20-day SMA - (20-day standard deviation of price x 2)
       bb = []
       usable_data.each_with_index do |value, index|
-        from = index+1-periods
+        from = index-periods+1
         if from >= 0
           middle_band = sma(usable_data[from..index], periods).last
-          upper_band = middle_band + (usable_data.standard_deviation * multiplier)
-          lower_band = middle_band - (usable_data.standard_deviation * multiplier)
+          upper_band = middle_band + (usable_data[from..index].standard_deviation * multiplier)
+          lower_band = middle_band - (usable_data[from..index].standard_deviation * multiplier)
           # output is [middle, upper, lower]
-          bb[index] = [middle_band, upper_band.round(3), lower_band.round(3)]
+          bb[index] = [middle_band, upper_band, lower_band]
         else
           bb[index] = nil
         end
       end
       return bb
+    end
+
+    # FIX ME!@!@! PROBABLY WRONG RESULTS.
+    # MACD
+
+    # MACD Line: (12-day EMA - 26-day EMA) 
+    # Signal Line: 9-day EMA of MACD Line
+    # MACD Histogram: MACD Line - Signal Line
+    # Default MACD(12, 26, 9)
+    def self.macd data, variables
+      faster_periods = get_variables(variables, 0, 12)
+      slower_periods = get_variables(variables, 1, 26)
+      signal_periods = get_variables(variables, 2, 9)
+      puts "faster=#{faster_periods}, slower=#{slower_periods}, signal=#{signal_periods}"
+
+      usable_data = Array.new
+      usable_data = get_data(data, slower_periods+signal_periods-1, :adj_close)
+      macd = []
+      macd_line = []
+
+      usable_data.each_with_index do |value, index|
+        if index+1 >= slower_periods
+          # Calibrate me! Not sure why it doesn't accept from or from_faster.
+          faster_ema = ema(usable_data[0..index], faster_periods).last
+          slower_ema = ema(usable_data[0..index], slower_periods).last
+          macd_line[index] = faster_ema - slower_ema
+          if index+1 >= slower_periods + signal_periods
+            # I'm pretty sure this is right
+            signal_line = ema(macd_line[(-signal_periods)..index], signal_periods).last 
+            # output is [MACD, Signal, MACD Hist]
+            macd_histogram = macd_line[index] - signal_line
+            macd[index] = [macd_line[index], signal_line, macd_histogram]
+          end
+        else
+          macd_line[index] = nil
+          macd[index] = nil
+        end
+      end
+      return macd
+
     end
 
 
